@@ -80,8 +80,11 @@ def read_cittadino(codice_fiscale):
     #dove utente e password me l'ha inviato il client
     #mentre il privilegio lo vado a leggere nel mio file  (utenti.json)
 
-    cittadino = cittadini.get(codice_fiscale)
-    if cittadino:
+    #cittadino = cittadini.get(codice_fiscale)
+    sQuery = f"SELECT *  FROM Utenti WHERE CodiceFiscale = '{codice_fiscale};" 
+    Iret = db.read_in_db(cur,sQuery)
+    if Iret == 1 :
+        cittadino = db.read_next_row(cur)
         return jsonify({"Esito": "000", "Msg": "Cittadino trovato", "Dati": cittadino}), 200
     else:
         return jsonify({"Esito": "001", "Msg": "Cittadino non trovato"}), 200
@@ -102,9 +105,10 @@ def update_cittadino():
     if content_type == 'application/json':
         jsonReq = request.json
         codice_fiscale = jsonReq.get('codFiscale')
-        if codice_fiscale in cittadini:
-            cittadini[codice_fiscale] = jsonReq
-            JsonSerialize(cittadini, file_path)  
+        query = f"SELECT * FROM UTENTI WHERE "
+        iRet = db.read_in_db(cur,query)
+        if iRet == 1 :
+
             return jsonify({"Esito": "000", "Msg": "Cittadino aggiornato con successo"}), 200
         else:
             return jsonify({"Esito": "001", "Msg": "Cittadino non trovato"}), 200
